@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <title>图书推荐系统</title>
+    </head>
+    <body>
+        <h1>Book Recommendation System</h1>
+        <p>{{ image }}</p>
+        <form action="{% url 'home:result' %}" method="post">
+            {% csrf_token %}
+            <input type="file" name="image_file" required/>
+            <input type="submit" value="提交"/>
+        </form>
+    </body>
+</html>
