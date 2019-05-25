@@ -6,10 +6,9 @@
     </head>
     <body>
         <h1>Book Recommendation System</h1>
-        <p>{{ image }}</p>
-        <form action="{% url 'home:result' %}" method="post">
+        <form enctype="multipart/form-data" action="{% url 'home:main' %}" method="post">
             {% csrf_token %}
-            <input type="file" name="image_file" required/>
+            {{ form }}
             <input type="submit" value="提交"/>
         </form>
     </body>
