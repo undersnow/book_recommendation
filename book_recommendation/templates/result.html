@@ -18,7 +18,7 @@
               {% for filename, img_path, URL in sim_files %}
               <tr>
                   <td>{{ filename }}</td>>
-                  <td><img src="{{ img_path }}" alt="empty"></td>
+                  <td><img src="{{ img_path }}" alt="{{ filename }}"></td>
                   <td><a href="{{ URL }}">{{ URL }}</a></td>
               </tr>
               {% endfor %}

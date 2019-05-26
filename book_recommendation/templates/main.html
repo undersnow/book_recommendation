@@ -3,13 +3,31 @@
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+        <script src="{{ url_for('static', filename='script.js') }}"></script> 
         <title>图书推荐系统</title>
     </head>
     <body>
         <h1>Book Recommendation System</h1>
         <form enctype="multipart/form-data" method="post">
-            <input type=file name=file required>
-            <input type="submit" value="提交"/>
+            <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+            <div class="file-upload">
+            <button class="file-upload-btn" type='submit'>Upload</button>
+            <div class="image-upload-wrap">
+                <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" name="file"/>
+                <div class="drag-text">
+                <h3>Drag and drop a file or select add Image</h3>
+                </div>
+            </div>
+            <div class="file-upload-content">
+                <img class="file-upload-image" src="#" alt="your image" />
+                <div class="image-title-wrap">
+                <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
+                </div>
+            </div>
+            {% if error %}
+            <script>alert("{{ error }}")</script>
+            {% endif %}
+            </div>
         </form>
     </body>
 </html>

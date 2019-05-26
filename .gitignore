@@ -176,4 +176,4 @@ fabric.properties
 # Project Secret Key
 .SECRET_KEY
 
-book_recommendation/book_recommendation/home/uploaded_file/*
+book_recommendation/uploaded/*
