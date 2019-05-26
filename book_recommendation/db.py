@@ -30,6 +30,13 @@ def init_db():
         db.executescript(f.read().decode('utf8'))
 
 
+def query_db(query, args=(), one=False):
+    cur = get_db().execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
+
 @click.command('init-db')
 @with_appcontext
 def init_db_command():

@@ -1,21 +1,8 @@
 import os
 import random
-from flask import Flask, flash, request, redirect, url_for, render_template
+from flask import Flask, flash, request, redirect, url_for, render_template, g, send_from_directory
 from werkzeug.utils import secure_filename
-
-
-def allowed_file(filename, ALLOWED_EXTENSIONS):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def preprocess(file_path):
-    return
-
-
-def find_sim_files(file_path):
-    sim_files = []
-    return sim_files
+import sqlite3
 
 
 def create_app(test_config=None):
@@ -40,10 +27,34 @@ def create_app(test_config=None):
         pass
 
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploaded')
+    MEDIA_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'media')
     ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'bmp'])
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.config['MEDIA_FOLDER'] = MEDIA_FOLDER
 
-    
+    from . import db
+    db.init_app(app)
+
+
+    def allowed_file(filename):
+        return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+    def preprocess(file_path):
+        return
+
+
+    def find_sim_files(file_path):
+        from . import db
+        books = db.query_db('select * from book')
+        sim_files = []
+        for book in books:
+            img_path = url_for('get_image', filename=book['name'] + '.jpg')
+            sim_files.append((book['name'], img_path, book['URL']))
+        return sim_files
+
+
     @app.route('/', methods=['GET', 'POST'])
     def upload_file():
         if request.method == 'POST':
@@ -57,7 +68,7 @@ def create_app(test_config=None):
             if file.filename == '':
                 flash('No selected file')
                 return redirect(request.url)
-            if file and allowed_file(file.filename, ALLOWED_EXTENSIONS):
+            if file and allowed_file(file.filename):
                 file_id = str(random.randint(0, 100000))
                 filename = file_id + '_' + secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -71,10 +82,11 @@ def create_app(test_config=None):
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         preprocess(file_path)
         sim_files = find_sim_files(file_path)
-        sim_files = [('filename1', 'img_path1', 'URL1'), ('filename2', 'img_path2', 'URL2')]
         return render_template('result.html', sim_files = sim_files)
 
-    from . import db
-    db.init_app(app)
+    @app.route('/media/<filename>')
+    def get_image(filename):
+        return send_from_directory(app.config['MEDIA_FOLDER'],
+                               filename)
 
     return app
