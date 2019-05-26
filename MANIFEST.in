@@ -1,0 +1,4 @@
+include book_recommendation/schema.sql
+graft book_recommendation/static
+graft book_recommendation/templates
+global-exclude *.pyc
