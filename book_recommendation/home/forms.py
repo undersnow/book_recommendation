@@ -1,5 +1,5 @@
 from django import forms
 
 
-class UploadFileForm(forms.Form):
-    file = forms.FileField(label='')
+class UploadImageForm(forms.Form):
+    image = forms.ImageField(label='上传图片文件', required=True)

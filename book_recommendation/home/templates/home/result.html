@@ -2,12 +2,26 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>上传成功</title>
+    <title>推荐结果</title>
 </head>
 <body>
-    <p>上传成功</p>
-    <div>
-        推荐结果
-    </div>
+    <a href="{% url 'home:main' %}">返回首页</a>
+    <table border="1">
+        <caption>推荐结果</caption>
+        <tbody>
+              <tr>
+                  <th>书名</th>
+                  <th>封面预览</th>
+                  <th>下载链接</th>
+              </tr>
+              {% for filename, img_path, URL in sim_files %}
+              <tr>
+                  <td>{{ filename }}</td>>
+                  <td><img src="{{ img_path }}" alt="empty"></td>
+                  <td>{{ URL }}</td>
+              </tr>
+              {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>
