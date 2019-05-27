@@ -19,3 +19,13 @@ getPosition()
 getInformation（图片路径）返回相应信息的url
 
 
+注意：
+爬取图片存放地址须符合格式 
+爬取图片    A\gallery\1\爬取所有图片
+查询图片    A\query\1\待查询图片
+getPosition()返回文件夹A的地址
+				  
+
+环境：
+pytorch 0.3+
+numpy
