@@ -1,5 +1,5 @@
 body {
-    font-family: sans-serif;
+    font-family: "Lucida Console", Monaco, monospace;
     background-color: #eeeeee;
   }
   
@@ -111,6 +111,78 @@ body {
   }
   
   .remove-image:active {
+    border: 0;
+    transition: all .2s ease;
+  }
+
+  table.result-table {
+    font-family: "Lucida Console", Monaco, monospace;
+    border: 2px solid #4F7849;
+    background-color: #EEEEEE;
+    width: 100%;
+    text-align: center;
+    border-collapse: collapse;
+  }
+  table.result-table td, table.result-table th {
+    border: 2px solid #4F7849;
+    padding: 3px 2px;
+  }
+  table.result-table tbody td {
+    font-size: 19px;
+    font-weight: bold;
+    color: #4F7849;
+  }
+  table.result-table tr:nth-child(even) {
+    background: #CEE0CC;
+  }
+  table.result-table td:nth-child(even) {
+    background: #D0E4F5;
+  }
+  table.result-table thead {
+    background: #4F7849;
+    background: -moz-linear-gradient(top, #7b9a76 0%, #60855b 66%, #4F7849 100%);
+    background: -webkit-linear-gradient(top, #7b9a76 0%, #60855b 66%, #4F7849 100%);
+    background: linear-gradient(to bottom, #7b9a76 0%, #60855b 66%, #4F7849 100%);
+    border-bottom: 1px solid #444444;
+  }
+  table.result-table thead th {
+    font-size: 15px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-align: left;
+    border-left: 2px solid #D0E4F5;
+  }
+  table.result-table thead th:first-child {
+    border-left: none;
+  }
+  
+  table.result-table tfoot td {
+    font-size: 16px;
+  }
+
+  .return-btn {
+    width: 10%;
+    margin: 0;
+    color: #fff;
+    background: #1FB264;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    border-bottom: 4px solid #15824B;
+    transition: all .2s ease;
+    outline: none;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  
+  .return-btn:hover {
+    background: #1AA059;
+    color: #ffffff;
+    transition: all .2s ease;
+    cursor: pointer;
+  }
+  
+  .return-btn:active {
     border: 0;
     transition: all .2s ease;
   }
