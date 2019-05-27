@@ -49,7 +49,7 @@ def create_app(test_config=None):
         from . import db
         books = db.query_db('select * from book')
         sim_files = []
-        for book in books:
+        for book in books[:10]:
             img_path = url_for('get_image', filename=book['name'] + '.jpg')
             sim_files.append((book['name'], img_path, book['URL']))
         return sim_files

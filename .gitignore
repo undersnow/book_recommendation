@@ -177,3 +177,5 @@ fabric.properties
 .SECRET_KEY
 
 book_recommendation/uploaded/*
+book_recommendation/media/*
+dataset.csv
