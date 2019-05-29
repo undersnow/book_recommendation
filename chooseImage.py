@@ -6,63 +6,29 @@ from torch.autograd import Variable
 import torch.backends.cudnn as cudnn
 from torchvision import datasets,transforms
 import os
+import scipy.io
 from model import ft_net
 import numpy as np
-
+from basic_func import *
+'''
+import matplotlib
+matplotlib.use('agg')
+import matplotlib.pyplot as plt
+'''
 batchsize = 32
 use_gpu = torch.cuda.is_available()
-# 加载训练好的模型
-def load_network(network):
-    network.load_state_dict(torch.load('./net.pth'))
-    return network
+'''
+def imshow(path, title=None):
+    """Imshow for Tensor."""
+    im = plt.imread(path)
+    plt.imshow(im)
+    if title is not None:
+        plt.title(title)
+    plt.pause(0.001)'''
 
-# 提取图片特征
-def fliplr(img):
-    inv_idx = torch.arange(img.size(3)-1,-1,-1).long()  # N x C x H x W
-    img_flip = img.index_select(3,inv_idx)
-    return img_flip
-
-def extract_feature(model,dataloaders):
-    features = torch.FloatTensor()
-    count = 0
-    for data in dataloaders:
-        img, label = data
-        n, c, h, w = img.size()
-        count += n
-        print(count)#可视化过程，可省略
-        ff = torch.FloatTensor(n,512).zero_()
-        for i in range(2):
-            if i==1:
-                img = fliplr(img)
-            input_img = Variable(img)
-            if use_gpu:
-                input_img = Variable(img.cuda())
-            outputs = model(input_img) 
-            f = outputs.data.cpu().float()
-            ff = ff+f
-        # norm feature
-        fnorm = torch.norm(ff, p=2, dim=1, keepdim=True)
-        ff = ff.div(fnorm.expand_as(ff))
-        features = torch.cat((features,ff), 0)
-    return features
-
-# 按相似度排序
-def sort_img(qf, gf):
-    query = qf.view(-1,1)
-    # print(query.shape)
-    score = torch.mm(gf,query)
-    score = score.squeeze(1).cpu()
-    score = score.numpy()
-    # predict index
-    index = np.argsort(score)  #from small to large
-    index = index[::-1]
-    return index
-
-
-
-def getSimliarPhotos(path,num):
+def getSimliarPhotos(path1,path2,num):
     list=[]
-    data_dir = path
+    #data_dir = path1
     if use_gpu:
         torch.cuda.set_device(0)
         cudnn.benchmark = True
@@ -74,11 +40,11 @@ def getSimliarPhotos(path,num):
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
     #加载图片
-    image_datasets = {x: datasets.ImageFolder( os.path.join(data_dir,x) ,data_transforms) for x in ['gallery','query']}
-    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batchsize,shuffle=False, num_workers=16) for x in ['gallery','query']}
-    class_names = image_datasets['query'].classes
-    gallery_path = image_datasets['gallery'].imgs
-    query_path = image_datasets['query'].imgs
+    #image_datasets = {x: datasets.ImageFolder( os.path.join(data_dir,x) ,data_transforms) for x in ['gallery','query']}
+    image_datasets = {'gallery': datasets.ImageFolder( path1 ,data_transforms),'query':datasets.ImageFolder( path2 ,data_transforms)}
+    print(image_datasets['query'].classes)
+    dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batchsize,shuffle=False, num_workers=16) for x in ['query']}
+
 
 
     # 加载模型
@@ -94,21 +60,40 @@ def getSimliarPhotos(path,num):
         model = model.cuda()
     #print(use_gpu)
     # 提取特征
+    result1 = scipy.io.loadmat('gallery.mat')
+    gallery_feature = torch.FloatTensor(result1['gallery_f'])
     with torch.no_grad():
-        gallery_feature = extract_feature(model, dataloaders['gallery'])
         query_feature = extract_feature(model, dataloaders['query'])
     if use_gpu:
         query_feature = query_feature.cuda()
         gallery_feature = gallery_feature.cuda()
 
-
     index = sort_img(query_feature[0],gallery_feature)
     query_path, _ = image_datasets['query'].imgs[0]
+
+    '''
+    fig = plt.figure(figsize=(16,4))
+    ax = plt.subplot(1,11,1)
+    ax.axis('off')
+    imshow(query_path,'query')
+    for i in range(10):
+        ax = plt.subplot(1,11,i+2)
+        ax.axis('off')
+        img_path, _ = image_datasets['gallery'].imgs[index[i]]
+
+        imshow(img_path)
+        ax.set_title('%d'%(i+1), color='red')
+        print(img_path)
+
+    fig.savefig("show.png")
+    '''
+    result = {'gallery_f': gallery_feature.cpu().numpy()}
+    scipy.io.savemat('gallery.mat', result)
     for i in range(num):
         img_path, _ = image_datasets['gallery'].imgs[index[i]]
         list.append(img_path)
     return list
 
 if __name__ == '__main__':
-    list=getSimliarPhotos('./pytorch',10)
-    print(list)
+    listg=getSimliarPhotos('./pytorch/gallery','./pytorch/query',10)
+    print(listg)
