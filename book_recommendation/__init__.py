@@ -41,17 +41,20 @@ def create_app(test_config=None):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-    def preprocess(file_path):
-        return
-
-
     def find_sim_files(file_path):
-        from . import db
-        books = db.query_db('select * from book')
+        from . import neural_network
+        sim_image_paths = neural_network.chooseImage.getSimliarPhotos(MEDIA_FOLDER, UPLOAD_FOLDER, 10)
         sim_files = []
-        for book in books[:10]:
-            img_path = url_for('get_image', filename=book['name'] + '.jpg')
-            sim_files.append((book['name'], img_path, book['URL']))
+        for sim_image_path in sim_image_paths:
+            name_jpg = os.path.basename(sim_image_path)
+            name = os.path.splitext(name_jpg)[0]
+            try:
+                book = db.query_db(f"select * from book where name = '{name}'")
+            except:
+                book = [{'URL':''}]
+            img_path = url_for('get_image', filename=name_jpg)
+            sim_files.append((name, img_path, book[0]['URL']))
+
         return sim_files
 
 
@@ -69,8 +72,8 @@ def create_app(test_config=None):
                 return render_template('main.html', error='No selected file')
             if file and allowed_file(file.filename):
                 file_id = str(random.randint(0, 100000))
-                filename = file_id + '_' + secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                filename = file_id + '.' + file.filename.split('.')[-1]
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], '1', filename))
                 return redirect(url_for('result',
                                         filename=filename))
             elif file and not allowed_file(file.filename):
@@ -80,14 +83,17 @@ def create_app(test_config=None):
 
     @app.route('/uploads/<filename>')
     def result(filename):
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        preprocess(file_path)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], '1', filename)
         sim_files = find_sim_files(file_path)
+        try:
+            os.remove(file_path)
+        except:
+            pass
         return render_template('result.html', sim_files = sim_files)
 
     @app.route('/media/<filename>')
     def get_image(filename):
-        return send_from_directory(app.config['MEDIA_FOLDER'],
+        return send_from_directory(os.path.join(app.config['MEDIA_FOLDER'], '1'),
                                filename)
 
     return app

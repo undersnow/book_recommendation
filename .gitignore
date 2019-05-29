@@ -178,4 +178,6 @@ fabric.properties
 
 book_recommendation/uploaded/*
 book_recommendation/media/*
+book_recommendation/neural_network/net.pth
+book_recommendation/neural_network/gallery.mat
 dataset.csv
