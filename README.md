@@ -1,21 +1,47 @@
 # book_recommendation
-自动识别图片并推荐相应图书
+This project will recommend related books automatically according to the book cover uploaded by users.
 
-	
-本项目基于三方
-神经网络  网页  爬虫 
-各方之间保持独立性，在自己的分支上写，最后合并
+## Getting Started
 
-三方之间应有统一的接口函数：
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-神经网络：
-getSimliarPhotos（查询图片路径，返回图片数量）  
-以列表形式返回相应数目的图片路径
+### Prerequisites
 
-爬虫：
-getPosition()
-返回爬取图片的文件路径（所有爬取图片存储在统一的文件夹下）
+- Python3.7
+  - torch >= 1.1.0
+  - torchvision >= 0.3.0
+  - numpy >= 1.16.3
+  - Flask >= 1.0.3
 
-getInformation（图片路径）返回相应信息的url
+### Installing
 
+Using virutal environment of Python is highly recommended:
 
+```
+$ mkdir your_dir
+$ cd your_dir
+$ python3.7 -m venv venv
+$ source venv/bin/activate
+```
+
+install packages required by the project
+
+```
+$ pip install -r requirements.txt
+```
+
+Setup and start the server locally
+
+```
+$ export FLASK_APP=book_recommendation
+$ export FLASK_ENV=development
+$ flask run
+```
+
+## Demo
+
+Please refer to [demo](demo/demo.mp4)
+
+## Deployment
+
+Please refer to [flask app deployment](http://flask.pocoo.org/docs/1.0/tutorial/deploy/)
