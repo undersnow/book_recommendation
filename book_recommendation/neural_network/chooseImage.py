@@ -26,7 +26,7 @@ def imshow(path, title=None):
         plt.title(title)
     plt.pause(0.001)'''
 
-def getSimliarPhotos(path1,path2,num):
+def getSimliarPhotos(gallery_dir, query_dir, num):
     list=[]
     #data_dir = path1
     if use_gpu:
@@ -41,7 +41,7 @@ def getSimliarPhotos(path1,path2,num):
     ])
     #加载图片
     #image_datasets = {x: datasets.ImageFolder( os.path.join(data_dir,x) ,data_transforms) for x in ['gallery','query']}
-    image_datasets = {'gallery': datasets.ImageFolder( path1 ,data_transforms),'query':datasets.ImageFolder( path2 ,data_transforms)}
+    image_datasets = {'gallery': datasets.ImageFolder( gallery_dir ,data_transforms),'query':datasets.ImageFolder( query_dir ,data_transforms)}
     # print(image_datasets['query'].classes)
     dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=batchsize,shuffle=False, num_workers=16) for x in ['query']}
 
@@ -89,7 +89,7 @@ def getSimliarPhotos(path1,path2,num):
     fig.savefig("show.png")
     '''
     result = {'gallery_f': gallery_feature.cpu().numpy()}
-    scipy.io.savemat('gallery.mat', result)
+    # scipy.io.savemat('gallery.mat', result)
     for i in range(num):
         img_path, _ = image_datasets['gallery'].imgs[index[i]]
         list.append(img_path)

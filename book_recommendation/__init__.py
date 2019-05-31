@@ -3,6 +3,8 @@ import random
 from flask import Flask, flash, request, redirect, url_for, render_template, g, send_from_directory
 from werkzeug.utils import secure_filename
 import sqlite3
+import time
+import shutil
 
 
 def create_app(test_config=None):
@@ -41,9 +43,9 @@ def create_app(test_config=None):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-    def find_sim_files(file_path):
+    def find_sim_files(file_folder):
         from . import neural_network
-        sim_image_paths = neural_network.chooseImage.getSimliarPhotos(MEDIA_FOLDER, UPLOAD_FOLDER, 10)
+        sim_image_paths = neural_network.chooseImage.getSimliarPhotos(MEDIA_FOLDER, file_folder, 10)
         sim_files = []
         for sim_image_path in sim_image_paths:
             name_jpg = os.path.basename(sim_image_path)
@@ -73,20 +75,27 @@ def create_app(test_config=None):
             if file and allowed_file(file.filename):
                 file_id = str(random.randint(0, 100000))
                 filename = file_id + '.' + file.filename.split('.')[-1]
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], '1', filename))
+                timestamp = str(time.time_ns())
+                file_folder = os.path.join(app.config['UPLOAD_FOLDER'], timestamp)
+                os.makedirs(os.path.join(file_folder, '1'))
+                file.save(os.path.join(file_folder, '1', filename))
                 return redirect(url_for('result',
-                                        filename=filename))
+                                        filename=filename, timestamp=timestamp))
             elif file and not allowed_file(file.filename):
                 return render_template('main.html', error='File type not allowed')
         return render_template('main.html')
 
 
-    @app.route('/uploads/<filename>')
-    def result(filename):
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], '1', filename)
-        sim_files = find_sim_files(file_path)
+    @app.route('/uploads/<timestamp>/<filename>')
+    def result(filename, timestamp):
+        file_folder = os.path.join(app.config['UPLOAD_FOLDER'], timestamp)
+        # file_path = os.path.join(file_folder, '1', filename)
         try:
-            os.remove(file_path)
+            sim_files = find_sim_files(file_folder)
+        except:
+            sim_files = []
+        try:
+            shutil.rmtree(file_folder)
         except:
             pass
         return render_template('result.html', sim_files = sim_files)
