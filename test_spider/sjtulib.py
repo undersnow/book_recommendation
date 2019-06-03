@@ -10,8 +10,9 @@ def main():
     csvFile = open('data.csv', 'a', newline='', encoding='utf_8')
     fileHeader = ["title", "author", "url"]
     writer = csv.writer(csvFile)
-    strbase = 'http://fx.sjtulib.superlib.net/s?size=15&isort=0&x=788_1071&pages='
+    strbase = 'http://fx.sjtulib.superlib.net/s?strchannel=11%2C12&strtype=2&size=15&isort=0&x=788_1071&pages='
     imgurlbase = "img/"
+    newimgurlbase='./new/'
     for i in range(1, 201):
         print(i)
         strurl = strbase + str(i)
@@ -30,12 +31,13 @@ def main():
             d.append(appurl)
             writer.writerow(d)
             title_img = imgurlbase + title + ".jpg"
+            new_title_img=newimgurlbase+title+'.jpg'
             r_img = requests.get(logo)
             with open(title_img, 'wb') as fp:
                 fp.write(r_img.content)
             img = Image.open(title_img)
             new_img = img.resize((128, 256), Image.ANTIALIAS)
-            new_img.save(title_img, quality=100)
+            new_img.save(new_title_img, quality=100)
     csvFile.close()
 
 
