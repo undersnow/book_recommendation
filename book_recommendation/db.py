@@ -1,3 +1,7 @@
+'''
+    姓名:李开涞
+    文件描述:数据库模块，采用sqlite
+'''
 import sqlite3
 
 import click
@@ -5,6 +9,7 @@ from flask import current_app, g
 from flask.cli import with_appcontext
 
 
+# 获取当前数据库
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(
@@ -16,6 +21,7 @@ def get_db():
     return g.db
 
 
+# 关闭当前数据库的链接
 def close_db(e=None):
     db = g.pop('db', None)
 
@@ -23,6 +29,7 @@ def close_db(e=None):
         db.close()
 
 
+# 初始化数据库，采用schema.sql中的sql语句
 def init_db():
     db = get_db()
 
@@ -30,6 +37,7 @@ def init_db():
         db.executescript(f.read().decode('utf8'))
 
 
+# 根据query查询数据库
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
     rv = cur.fetchall()

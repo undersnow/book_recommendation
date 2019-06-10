@@ -1,3 +1,7 @@
+'''
+    姓名:李开涞
+    文件描述:网站模块
+'''
 import os
 import random
 from flask import Flask, flash, request, redirect, url_for, render_template, g, send_from_directory
@@ -28,21 +32,26 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    #设置用户上传的文件夹名，以及数据库中所有包含的图片
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploaded')
     MEDIA_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'media')
+    #限制允许上传的文件扩展名
     ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'bmp'])
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config['MEDIA_FOLDER'] = MEDIA_FOLDER
 
+    # 初始化数据库  
     from . import db
     db.init_app(app)
 
 
+    # 通过扩展名判断文件是否允许上传
     def allowed_file(filename):
         return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+    # 从神经网络得到结果，再经由数据库，返回相似文件的文件名
     def find_sim_files(file_folder):
         from . import neural_network
         sim_image_paths = neural_network.chooseImage.getSimliarPhotos(MEDIA_FOLDER, file_folder, 10)
@@ -60,6 +69,7 @@ def create_app(test_config=None):
         return sim_files
 
 
+    # 主页面，处理用户上传
     @app.route('/', methods=['GET', 'POST'])
     def upload_file(error=None):
         if request.method == 'POST':
@@ -74,10 +84,13 @@ def create_app(test_config=None):
                 return render_template('main.html', error='No selected file')
             if file and allowed_file(file.filename):
                 file_id = str(random.randint(0, 100000))
+                # 重命名文件
                 filename = file_id + '.' + file.filename.split('.')[-1]
                 timestamp = str(time.time_ns())
+                # 生成临时文件夹
                 file_folder = os.path.join(app.config['UPLOAD_FOLDER'], timestamp)
                 os.makedirs(os.path.join(file_folder, '1'))
+                # 保存文件到临时文件夹
                 file.save(os.path.join(file_folder, '1', filename))
                 return redirect(url_for('result',
                                         filename=filename, timestamp=timestamp))
@@ -86,6 +99,7 @@ def create_app(test_config=None):
         return render_template('main.html')
 
 
+    # 结果显示页面
     @app.route('/uploads/<timestamp>/<filename>')
     def result(filename, timestamp):
         file_folder = os.path.join(app.config['UPLOAD_FOLDER'], timestamp)
@@ -100,6 +114,7 @@ def create_app(test_config=None):
             pass
         return render_template('result.html', sim_files = sim_files)
 
+    # 图片显示
     @app.route('/media/<filename>')
     def get_image(filename):
         return send_from_directory(os.path.join(app.config['MEDIA_FOLDER'], '1'),

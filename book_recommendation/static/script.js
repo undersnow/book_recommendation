@@ -1,3 +1,7 @@
+/*
+  姓名：李开涞
+  描述：主页面处理用户上传的动态交互
+*/
 function readURL(input) {
     if (input.files && input.files[0]) {
   
