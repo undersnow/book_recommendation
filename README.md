@@ -76,11 +76,13 @@ http://www.liangzheng.com.cn/Project/project_reid.html
 
 ###### 计算特征值
 
-运行choose.py（位于目录book_recommendation\neural_network），该程序会计算爬取的图片的特征值，注意：加载爬取的图片时,程序中的路径需要根据实际修改
+运行choose.py（位于目录book_recommendation\neural_network），该程序会计算爬取的图片的特征值并生成mat文件，注意：加载爬取的图片时,程序中的路径需要根据实际修改
 
 
 
 ###### 然后根据部署文档进行网站部署即可
+
+注意：部署时mat文件和pth文件均需放在book_recommendation\neural_network目录下
 
 部署文档：[部署](部署文档.pdf)
 
